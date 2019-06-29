@@ -18,10 +18,15 @@ validation = mnist.validation  # 5000 组 图片和标签, 用于迭代验证训
 test = mnist.test  # 10000 组 图片和标签, 用于最终测试训练的准确性。
 
 
-def dataset2pic(dataset, savepath):
+def dataset2pic(dataset, savepath, colmax=50, rowmax=50):
     if not os.path.exists(savepath):
-        os.mkdir(savepath)
+        os.makedirs(savepath)
     imgdatas = dataset.images
+    arrcol = np.zeros([28, 28])
+    arrrow = np.zeros([28, 280])
+    colindex, rowindex = 0, 0
+    one = np.ones([28 * colmax, 28 * rowmax]) * 255
+    # colmax, rowmax = 50, 50
     for imgindex in range(len(imgdatas)):
         imagedata = imgdatas[imgindex]
         k = len(imagedata) // 28
@@ -29,15 +34,41 @@ def dataset2pic(dataset, savepath):
         for i in range(1, k):
             arr = np.vstack([arr, imagedata[i * 28:(i + 1) * 28]])
 
-        img = Image.fromarray(arr * 255).convert('RGB')
-        img.save('%s/%05d.png' % (savepath, imgindex + 1))
-        print('%s成功保存至%s' % (imgindex + 1, savepath))
+        # print(len(arrcol))
+        # print(len(arr))
+        if colindex == 0:
+            arrcol = arr
+            colindex += 1
+        else:
+            arrcol = np.column_stack((arrcol, arr))
+            colindex += 1
+            if colindex == colmax:
+                colindex = 0
+                if rowindex == 0:
+                    arrrow = arrcol
+                    rowindex += 1
+                else:
+                    arrrow = np.row_stack((arrrow, arrcol))
+                    rowindex += 1
+                    if rowindex == rowmax:
+                        rowindex = 0
+                        imgid = ((imgindex + 1) // (rowmax * colmax))
+                        imgname = '%03d' % imgid
+                        img = Image.fromarray(arrrow * 255).convert('RGB')
+                        img.save('%s/%s_1.png' % (savepath, imgname))
+                        img = Image.fromarray(one - arrrow * 255).convert('RGB')
+                        img.save('%s/%s_2.png' % (savepath, imgname))
+                        print('已成功输出%s\t%s' % (savepath, imgid))
+
+        # img = Image.fromarray(arr * 255).convert('RGB')
+        # img.save('%s/%05d.png' % (savepath, imgindex + 1))
+        # print('%s成功保存至%s' % (imgindex + 1, savepath))
 
 
 def testfun():
-    dataset2pic(train, 'images/train')
-    dataset2pic(validation, 'images/validation')
-    dataset2pic(test, 'images/test')
+    dataset2pic(train, 'images1/train')
+    dataset2pic(validation, 'images1/validation')
+    dataset2pic(test, 'images1/test')
     # testimages, testlabels = train.images, train.labels
     #
     # imagedata = testimages[0]

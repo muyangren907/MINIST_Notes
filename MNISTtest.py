@@ -25,7 +25,7 @@ def dataset2pic(dataset, savepath, colmax=50, rowmax=50):
     arrcol = np.zeros([28, 28])
     arrrow = np.zeros([28, 280])
     colindex, rowindex = 0, 0
-    one = np.ones([28 * colmax, 28 * rowmax]) * 255
+    one = np.ones([28 * rowmax, 28 * colmax]) * 255
     # colmax, rowmax = 50, 50
     for imgindex in range(len(imgdatas)):
         imagedata = imgdatas[imgindex]
@@ -66,9 +66,10 @@ def dataset2pic(dataset, savepath, colmax=50, rowmax=50):
 
 
 def testfun():
-    dataset2pic(train, 'images1/train')
-    dataset2pic(validation, 'images1/validation')
-    dataset2pic(test, 'images1/test')
+    colmax, rowmax = 50, 20
+    dataset2pic(train, '%02d_%02d/train' % (colmax, rowmax), colmax, rowmax)
+    dataset2pic(validation, '%02d_%02d/validation' % (colmax, rowmax), colmax, rowmax)
+    dataset2pic(test, '%02d_%02d/test' % (colmax, rowmax), colmax, rowmax)
     # testimages, testlabels = train.images, train.labels
     #
     # imagedata = testimages[0]

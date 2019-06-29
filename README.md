@@ -1,1 +1,1 @@
-# MINIST_Notes
+# MNIST_Notes
